@@ -1,0 +1,15 @@
+actor Approx () uint(size=8) Dup ==> uint(size=8) Approx:
+
+uint(size=8) res;
+
+@native function get_approx_2n(uint(size=8) num) --> int(size=8)
+end
+
+sendApprox : action Dup:[d] ==> Approx:[res]
+
+do
+	res := get_approx_2n(d);
+	//println("Value in : "+d+" Approx to : "+res);
+end
+
+end

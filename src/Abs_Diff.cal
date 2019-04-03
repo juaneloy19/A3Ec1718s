@@ -1,0 +1,21 @@
+actor Abs_Diff () uint(size=8) Approx, uint(size=8) Original ==> uint(size=8) Diff:
+
+PosDiff: action Approx:[a], Original:[o] ==> Diff:[d]
+guard
+	a > o
+var uint(size=8) d
+do
+	d := a-o;
+	//println("Pos Diff:"+d);
+end
+
+NegDiff: action Approx:[a], Original:[o] ==> Diff:[d]
+guard
+	a <= o
+var uint(size=8) d
+do
+	d := o-a;
+	//println("Neg Diff:"+d);
+end
+
+end

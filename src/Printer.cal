@@ -1,0 +1,32 @@
+actor Printer () uint(size=32) Average ==> :
+
+@native procedure write_init() end
+@native procedure write_o(int b,int num) end
+@native procedure write_close() end
+
+uint(size=8) frame_num := 0;
+
+initialize ==>
+do
+ write_init();
+end
+
+Write: action Average:[a] ==>
+//guard
+//	frame_num<10
+do
+	println("Frame: "+frame_num+" Average SAD: "+a);
+	write_o(a,frame_num);
+	frame_num := frame_num+1;
+	println("Waiting for Frame: "+frame_num);
+end
+
+//Close_Write: action ==>
+//guard
+//	frame_num >= 10
+//do
+//	println("Done");
+//	write_close();
+//end
+
+end

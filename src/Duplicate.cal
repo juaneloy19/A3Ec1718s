@@ -1,0 +1,17 @@
+actor Duplicate () uint(size=8) Frame, bool EOF ==> uint(size=8) Dup, uint(size=8) Original:
+
+sendDuplicate : action Frame:[f], EOF:[eof] ==> Dup:[f],Original:[f]
+guard
+ eof = false
+do
+	//println("Received: "+f);
+end
+
+FileDone : action EOF:[eof] ==> 
+guard
+	eof = true
+do
+	println("File Done");
+end
+
+end
