@@ -1,0 +1,39 @@
+package encription;
+
+actor decrypt2 () uint(size=8) In, bool EOF ==>  uint (size=8) Out, bool done:
+	
+	int  count:=0;
+	int  key:=0;
+	
+    read: action In: [ In1 ] ==> Out: [Out1]
+    var
+      uint(size=8) Out1, uint(size=8) data
+    do
+    	if count = 0 then	
+      		println("KEY is " + In1);
+      		key:= In1;
+      		//Out1 := In1;
+     	    count := count+1;      
+     	else if In1-key = 35 then //# end of message
+     	    println("End of message");
+     	    count:=count+1;
+      	else   
+      	    count := count+1;   
+      	    data := In1-key;
+      		println("Data=" + In1 + " Decryption=" + data + " Key=" + key );
+      		Out1 := data;
+      	end end
+      		
+    end
+	  
+    close: action EOF: [In1] ==>  done: [In1]  
+    do
+		println("Done Decryption Message");
+    end
+	  
+    schedule fsm state1:
+      state1 ( read ) --> state1;
+      state1 ( close ) --> state1; 
+    end
+
+end
