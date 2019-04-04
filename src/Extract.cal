@@ -1,0 +1,26 @@
+actor Extract () int(size = 8) input ==> :
+	@native procedure write_init() end
+	@native procedure write_o(int b) end
+	@native procedure write_close() end
+	initialize ==>
+	do
+		write_init();
+	end
+	
+	// Write output to file
+	action input:[a] ==>
+	guard
+		a > 0
+	do
+		println("Extract: The data is " + a);
+		write_o(a);
+	end
+	
+	// Close the file
+	action input:[a] ==>
+	guard
+		a = 0
+	do
+		write_close();
+	end
+end

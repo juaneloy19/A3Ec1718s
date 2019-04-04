@@ -1,0 +1,51 @@
+actor Read() ==> int(size = 8) out1:
+	uint(size=32) fileSize := 0;
+	uint(size=32) bytesRead := 0;
+	@native procedure source_init() end
+	@native function source_read_i() --> int(size = 8) end
+	@native function source_sizeOfFile() --> int(size = 32) end
+	
+	initialize ==>
+
+	do
+		source_init();
+	end
+	
+	// Get Size of File to Read
+	getFileSize: action ==>
+	guard
+		source_sizeOfFile() > 0
+	do
+		println("Get File Size");
+		fileSize := source_sizeOfFile();
+	end
+	
+	// Read a Byte
+	readByte: action ==> out1 :[source_read_i()]
+	guard
+	bytesRead < fileSize
+	do
+		bytesRead := bytesRead + 1;
+		println("Read Bytes " + bytesRead);
+	end
+	
+	// Read Last Byte
+	readLastByte: action ==> out1 :[source_read_i()]
+	guard
+		bytesRead = fileSize
+	do
+		bytesRead := bytesRead + 1;
+		println("Read Last Bytes " + bytesRead);
+	end
+	
+	// Send zero (Done)
+	sendZero: action ==> out1 :[0]
+	end
+	
+	schedule fsm ReadInit :
+		ReadInit (getFileSize) --> ReadFile;
+		ReadFile (readByte) --> ReadFile;
+		ReadFile (readLastByte) --> ReadFileDone;
+		ReadFileDone (sendZero) --> ReadFileDone;
+	end
+end
