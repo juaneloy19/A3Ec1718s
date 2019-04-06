@@ -4,7 +4,7 @@
 FILE* input_i = NULL;
 FILE* output_o = NULL;
 
-void source_init()
+void source_init_message()
 {
 	input_i = fopen("example_input.txt", "r");
 
@@ -38,7 +38,7 @@ char source_read_i()
 	return sample;
 }
 
-int source_sizeOfFile()
+int source_sizeOfFile_message()
 {
 	fseek(input_i, 0, SEEK_END);
 	int size = ftell(input_i);

@@ -1,6 +1,5 @@
-actor Insert () int(size = 8) input, int(size = 8) dct_input ==> int(size = 8) output:
-    @native function char_to_ascii(int b) --> int(size = 8) end
-	// Increment value by 1
+actor Insert () int(size = 8) input, int(size=13) dct_input ==> int(size = 13) output:
+    @native function char_to_ascii(int b) --> int(size = 13) end
 	action input:[a] ==> output:[char_to_ascii(a)]
 	guard
 		a > 0
@@ -8,7 +7,6 @@ actor Insert () int(size = 8) input, int(size = 8) dct_input ==> int(size = 8) o
 		println("Insert: The data is " + a);
 	end
 	
-	// If value is 0, do not increment, but send a zero
 	action input:[a] ==> output:[a]
 	guard
 		a = 0
