@@ -1,15 +1,58 @@
-actor Insert () int(size = 8) input, int(size=13) dct_input ==> int(size = 13) output:
-    @native function char_to_ascii(int b) --> int(size = 13) end
-	action input:[a] ==> output:[char_to_ascii(a)]
-	guard
-		a > 0
-	do
-		println("Insert: The data is " + a);
+actor Insert () int(size = 8) msg_input, int(size=13) dct_input ==> int(size = 13) output:
+    int (size=8) msgBuffIdx :=0;
+    int (size=8) msgBuffCpyIdx :=0;
+    int (size=8) charBuffIdx :=0;
+    
+    bool lastDctIdxIsOdd := false;
+   
+    List (type:int, size = 8) charBuffer;
+    List (type:List(type:int,size = 8), size = 198) msgBuffer;
+    @native function check_last_idx(int b) --> bool end
+	@native function char_to_ascii(int b) --> int(size = 13) end
+	
+	procedure convert_to_bin(int(size =8) n, int buff[8])
+	begin
+		foreach int i in 7 .. 0 do
+     		if (n & (1 << i)) = 0 then
+       			buff[i] := 0;
+     		else
+       			buff[i] := 1;
+     		end
+    	end
 	end
 	
-	action input:[a] ==> output:[a]
+	action dct_input:[a] repeat 64 ==> output:[out] repeat 64
 	guard
-		a = 0
+	a[0] > 0
+	var int out[64]
+	do
+	if msgBuffIdx = 0 then
+		foreach int s in 0 .. 63 do
+			println("Insert Actor: Directly sending DCT input to output " + a[s]);
+		end
+	end
+	
+	action msg_input:[b] ==>
+	guard
+		b>0
+    var int(size=1)tmpMsgBuff [8]
+	do
+	   convert_to_bin(b,tmpMsgBuff);
+	   msgBuffer[msgBuffIdx] := tmpMsgBuff;
+	   msgBuffIdx := msgBuffIdx + 1;
+	end
+	
+	action ==>
+	guard
+		(charBuffIdx = 0) and (msgBuffCpyIdx < msgBuffIdx)
+	do
+	    charBuffer := msgBuffer[msgBuffCpyIdx];
+	    msgBuffCpyIdx := msgBuffCpyIdx + 1;
+	end
+	
+	action dct_input:[a] ==> output:[a]
+	guard
+		msgBuffIdx > 0
 	do
 	end
 end
