@@ -97,3 +97,19 @@ char ascii_to_char(int encrypted_message)
 	char decrypted_message = encrypted_message;
 	return decrypted_message;
 }
+
+bool check_last_idx(int b)
+{
+	bool isOdd;
+
+	if (b % 2){
+		isOdd = true;
+		printf("check_last_idx: %d is Odd\n", b);
+	}
+	else{
+        	
+		isOdd = false;
+		printf("check_last_idx: %d is Even\n", b);
+        }
+	return isOdd;
+}
