@@ -1,7 +1,8 @@
-actor picBuffer () uint(size=8) I_pixel, bool EOF  ==> uint(size=8) O_pixel:
+actor frame2blockS2 () uint(size=8) I_pixel ==> uint(size=8) O_pixel:
 
 	int f_width  = 352;
 	int f_height = 288;
+	int fp_height = (f_height*3)/2;
 	int b_size   = 8;
 	int b_width  = f_width/b_size;
 	int b_height = f_height/b_size;	
@@ -12,14 +13,15 @@ actor picBuffer () uint(size=8) I_pixel, bool EOF  ==> uint(size=8) O_pixel:
 	uint(size=16) px := 0;
 	uint(size=16) py := 0;
 	bool frame_received := false;
-	// bool frame_sent := false;
+	int frames = 15;
+	bool eof := false;
 	
-	@native function getBlockPixel(uint(size=8) w_block_num,uint(size=8) h_block_num,int x,int y) --> uint(size=8) end
+	@native function getBlockPixel(uint(size=8)  w_block_num,uint(size=8) h_block_num,int x,int y) --> uint(size=8) end
 	@native procedure updateFrame(uint(size=8) in_pix,uint(size=16) x_pix,uint(size=16)y_pix) end
 	
-ReceiveFrame : action I_pixel:[ip], EOF:[eof] ==>
+ReceiveFrame : action I_pixel:[ip] ==>
 guard
-	py < f_height and eof = false and frame_received = false
+	py < fp_height and frame_received = false
 do
 
 	updateFrame(ip,px,py);
@@ -29,26 +31,29 @@ do
 		py := py+1;
 		px := 0;
 	end
+	/*if py = f_height
+	then
+		println("All Ys received");
+	end*/
 	if py = f_height
 	then
 		py := 0;
 		frame_r := frame_r+1;
-		println("Frame received"+frame_r);
+		println("F2B Frame received"+frame_r);
 		frame_received := true;
 	end
-
 end
 
-SendBlock : action EOF:[eof] ==> O_pixel:[blk] repeat 64
+SendBlock : action ==> O_pixel:[blk] repeat 64
 guard
-	eof = false and frame_received = true
+	frame_received = true
 var
 	uint(size=5) idx := 0,
 	List(type:uint(size=8),size=64) blk
 do
-	foreach int y in 0 .. 7
+	foreach int y in 0 .. (b_size-1)
 	do
-		foreach int x in 0 .. 7
+		foreach int x in 0 .. (b_size-1)
 		do
 			blk[idx] := getBlockPixel(w_block_num,h_block_num,x,y);
 			idx := idx+1;
@@ -60,20 +65,19 @@ do
 		w_block_num := 0;
 		h_block_num := h_block_num+1;
 	end
+	println("F2B Block sent X: "+ w_block_num + " Y: "+h_block_num);
 	if h_block_num >= b_height
 	then
 		h_block_num := 0;
 		frame_num := frame_num+1;
-		println("Frame: "+frame_num);
+		println("F2B Frame sent: "+frame_num);
 		frame_received := false;
 	end
-end
-
-FileDone : action EOF:[eof] ==> 
-guard
-	eof = true
-do
-	println("File Done");
+	if frame_num = frames
+	then
+		eof := true;
+		println("File done");
+	end
 end
 
 /*NextBlock : action ==>
