@@ -4,55 +4,109 @@ actor Insert () int(size = 8) msg_input, int(size=13) dct_input ==> int(size = 1
     int (size=8) charBuffIdx :=0;
     
     bool lastDctIdxIsOdd := false;
+    bool not_received_first_message := true;
    
     List (type:int, size = 8) charBuffer;
     List (type:List(type:int,size = 8), size = 198) msgBuffer;
     @native function check_last_idx(int b) --> bool end
 	@native function char_to_ascii(int b) --> int(size = 13) end
 	
-	procedure convert_to_bin(int(size =8) n, int buff[8])
+	procedure convert_to_bin(int(size =8) n, int(size =8) buff[8])
 	begin
-		foreach int i in 7 .. 0 do
+		println("Convert_to_bin: converting " + n);
+		foreach int i in 0 .. 7 do
      		if (n & (1 << i)) = 0 then
        			buff[i] := 0;
+       			println("Convert_to_bin: bit " + i + " is 0");
      		else
        			buff[i] := 1;
+       			println("Convert_to_bin: bit " + i + " is 1");
      		end
     	end
 	end
 	
-	action dct_input:[a] repeat 64 ==> output:[out] repeat 64
-	guard
-	a[0] > 0
-	var int out[64]
-	do
-	if msgBuffIdx = 0 then
-		foreach int s in 0 .. 63 do
-			println("Insert Actor: Directly sending DCT input to output " + a[s]);
-		end
-	end
-	
-	action msg_input:[b] ==>
+MESSAGE_BUFFERING:	action msg_input:[b] ==>
 	guard
 		b>0
     var int(size=1)tmpMsgBuff [8]
 	do
 	   convert_to_bin(b,tmpMsgBuff);
-	   msgBuffer[msgBuffIdx] := tmpMsgBuff;
+	   println("Received message input msgBuffIdx" + msgBuffIdx);
+	   foreach int i in 0 ..7  do
+	   	msgBuffer[msgBuffIdx][i] := tmpMsgBuff[i];
+	   end
 	   msgBuffIdx := msgBuffIdx + 1;
+	   foreach int i in 0 .. 7 do
+	   	  println("Received message input tmpMsgBuff bit" + i + "is " + tmpMsgBuff[i]);
+	   end
+	   not_received_first_message := false;
 	end
 	
-	action ==>
+DCT_BUFFERING:	action dct_input:[a] repeat 64 ==> output:[out] repeat 64
+	var int out[64]
+	do
+	foreach int s in 0 .. 62 do
+		out[s] := a[s];
+		println("Insert Actor: Directly sending DCT input to output " + out[s]);
+	end
+	if msgBuffIdx = 0 then
+	  	out[63] := a[63];
+		println("Insert Actor: Directly sending DCT input to output " + out[63]);
+	else
+		if charBuffIdx > 0 then
+		  	lastDctIdxIsOdd := 	check_last_idx(a[63]);
+		  	if charBuffer[charBuffIdx] = 0 then
+		  		if lastDctIdxIsOdd then
+		  			a[63] := a[63] +1;
+		  			charBuffIdx := charBuffIdx -1;
+		  			println("Insert Actor: last index is odd and want to send 0 changing to " + a[63]);
+		  		else
+		  			charBuffIdx := charBuffIdx -1;
+		  			println("Insert Actor: last index is even and want to send 0 sending " + a[63]);
+		  		end
+		  	else
+		  		if lastDctIdxIsOdd then
+		  			charBuffIdx := charBuffIdx -1;
+		  			println("Insert Actor: last index is odd and want to send 1 sending " + a[63]);
+		  		else
+		  			a[63] := a[63] +1;
+		  			charBuffIdx := charBuffIdx -1;
+		  			println("Insert Actor: last index is even and want to send 1 changing to " + a[63]);
+		  		end
+		  	end
+	  	end
+	  	out[63] := a[63];
+		println("Insert Actor: Sending last modified DCT input to output " + out[63]);
+	end
+	end
+	
+
+	
+CHAR_BUFFERING:	action ==>
 	guard
 		(charBuffIdx = 0) and (msgBuffCpyIdx < msgBuffIdx)
 	do
-	    charBuffer := msgBuffer[msgBuffCpyIdx];
+	    
+	    foreach int i in 0 ..7  do
+	   	  charBuffer [i] := msgBuffer[msgBuffCpyIdx][i];
+	    end
+	    println("Loading charBuffer, msgBuffCpyIdx " + msgBuffCpyIdx);
+	    foreach int i in 0 ..7  do
+	   	  println("charBuffer bit" + i + "is " + charBuffer[i]);
+	   end
 	    msgBuffCpyIdx := msgBuffCpyIdx + 1;
+	    charBuffIdx := 8;
 	end
 	
-	action dct_input:[a] ==> output:[a]
-	guard
-		msgBuffIdx > 0
-	do
-	end
+/* 	schedule fsm state1:
+      state1 (MESSAGE_BUFFERING) --> state2;
+      state2 (CHAR_BUFFERING) --> state3;
+      state3 (DCT_BUFFERING) --> state1;
+    end
+    
+    priority 
+	    MESSAGE_BUFFERING>DCT_BUFFERING;
+	    CHAR_BUFFERING>DCT_BUFFERING;
+    end
+*/	
 end
