@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="TopInsert">
+    <Instance id="Read">
+        <Class name="Read"/>
+    </Instance>
+    <Instance id="source">
+        <Class name="source"/>
+    </Instance>
+    <Instance id="Message_Buffering">
+        <Class name="Message_Buffering"/>
+    </Instance>
+    <Instance id="dct">
+        <Class name="dct"/>
+    </Instance>
+    <Instance id="replicator">
+        <Class name="replicator"/>
+    </Instance>
+    <Instance id="Extract">
+        <Class name="Extract"/>
+    </Instance>
+    <Instance id="idct">
+        <Class name="idct"/>
+    </Instance>
+    <Instance id="write">
+        <Class name="write"/>
+    </Instance>
+    <Instance id="Insert">
+        <Class name="Insert"/>
+    </Instance>
+    <Connection dst="Message_Buffering" dst-port="msg_input" src="Read" src-port="out1"/>
+    <Connection dst="dct" dst-port="In" src="source" src-port="Stream"/>
+    <Connection dst="Insert" dst-port="msg_input"
+        src="Message_Buffering" src-port="bin_msg_out"/>
+    <Connection dst="Insert" dst-port="dct_input" src="dct" src-port="Out"/>
+    <Connection dst="replicator" dst-port="input1" src="Insert" src-port="output"/>
+    <Connection dst="idct" dst-port="F" src="replicator" src-port="Output2"/>
+    <Connection dst="write" dst-port="Byte" src="idct" src-port="f"/>
+    <Connection dst="write" dst-port="pEOF" src="source" src-port="EOF"/>
+</XDF>
