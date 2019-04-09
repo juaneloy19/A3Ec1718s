@@ -19,7 +19,7 @@ actor Extract () int(size = 8) input ==> :
 	// Close the file
 	action input:[a] ==>
 	guard
-		a = 0
+		a = 35
 	do
 		write_close();
 	end
