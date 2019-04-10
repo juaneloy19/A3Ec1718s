@@ -1,10 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <stdbool.h>
 
 FILE* input_i = NULL;
 FILE* output_o = NULL;
 
-void source_init()
+void source_init_message()
 {
 	input_i = fopen("example_input.txt", "r");
 
@@ -38,7 +39,7 @@ char source_read_i()
 	return sample;
 }
 
-int source_sizeOfFile()
+int source_sizeOfFile_message()
 {
 	fseek(input_i, 0, SEEK_END);
 	int size = ftell(input_i);
@@ -96,4 +97,20 @@ char ascii_to_char(int encrypted_message)
 {
 	char decrypted_message = encrypted_message;
 	return decrypted_message;
+}
+
+bool check_last_idx(int b)
+{
+	bool isOdd;
+
+	if (b % 2){
+		isOdd = true;
+		printf("check_last_idx: %d is Odd\n", b);
+	}
+	else{
+        	
+		isOdd = false;
+		printf("check_last_idx: %d is Even\n", b);
+        }
+	return isOdd;
 }

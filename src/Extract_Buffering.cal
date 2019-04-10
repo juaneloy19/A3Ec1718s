@@ -1,0 +1,18 @@
+actor Extract_Buffering () int(size=13) dct_input ==> int(size = 1) output:
+    
+    bool lastDctIdxIsOdd := false;
+    @native function check_last_idx(int b) --> bool end
+	
+EXTRACT_BUFFERING:	action dct_input:[a] repeat 64 ==> output:[out]
+	var int (size =1) out
+	do
+	lastDctIdxIsOdd := 	check_last_idx(a[63]);
+	if lastDctIdxIsOdd then
+		out := 1;
+		println("EXTRACT_BUFFERING: last index is odd and want to send 1");
+	else
+		println("EXTRACT_BUFFERING: last index is even and want to send 0");
+	end
+    println("EXTRACT_BUFFERING: Done sending " + out);
+end
+end

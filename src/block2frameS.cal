@@ -1,0 +1,109 @@
+actor block2frameS () uint(size=8) I_pixel ==> uint(size=8) O_pixel, bool o_EOF :
+
+	int f_width  = 352;
+	int f_height = 288;
+	int fp_height = (f_height*3)/2;
+	int b_size   = 8;
+	int b_width  = f_width/b_size;
+	int b_height = f_height/b_size;	
+	uint(size=8) frame_num := 0;
+	uint(size=8) block_row := 0;
+	uint(size=8) w_block_num := 0;
+	uint(size=8) h_block_num := 0;
+	uint(size=16) x := 0;
+	uint(size=16) y := 0;
+	bool frame_received := false;
+	bool block_rxd := false;
+	bool eof := false;
+	int frames = 15;
+	int frame_sent := 0;
+	// bool frame_sent := false;
+	
+	@native function getFramePixel(int x,int y) --> uint(size=8) end
+	@native procedure updateBlock(uint(size=8) in_pix,uint(size=8) w_block_num,uint(size=8) h_block_num ,uint(size=16) x_pix,uint(size=16)y_pix) end
+	
+ReceiveBlock : action I_pixel:[ip] repeat 64 ==>
+guard
+	eof = false and block_rxd= false
+var
+	uint(size=5) idx := 0
+do
+	foreach int y in 0 .. (b_size-1)
+	do
+		foreach int x in 0 .. (b_size-1)
+		do
+			updateBlock(ip[idx],w_block_num,h_block_num,x,y);
+			idx := idx + 1;
+		end
+	end
+	
+	w_block_num := w_block_num+1;
+	if w_block_num >= b_width
+	then
+		w_block_num := 0;
+		h_block_num := h_block_num+1;
+		println("Received block Row: "+block_row);
+		block_row := block_row + 1;
+		block_rxd := true;
+	end
+	if h_block_num >= b_height
+	then
+		h_block_num := 0;
+		block_row := 0;
+		frame_num := frame_num+1;
+		println("B2F Frame Received: "+frame_num);
+		frame_received := true;
+	end
+end
+
+// Change to row of blocks
+SendFrame : action ==> O_pixel : [blk], o_EOF:[eof]
+guard
+	//frame_received = true
+	eof = false and block_rxd = true
+var
+	uint(size=8) blk := 0
+do
+	blk := getFramePixel(x,y);
+	x := x+1;
+	if x = f_width
+	then
+		y := y+1;
+		x := 0;
+	end
+	if y = f_height
+	then
+		y := 0;
+		frame_sent := frame_sent+1;
+		println("B2F Frame sent: "+frame_sent);
+		frame_received := false;
+		if frame_sent = frames
+		then
+			eof := true;
+			println("B2F File Done");
+		end
+	end
+	//writeFrame();
+	if y = block_row*b_size
+	then
+		x := 0;
+		block_rxd := false;
+		println("B2F Frame: "+ frame_num + " Row Sent: "+block_row);
+	end
+end
+
+DoneSending : action ==> o_EOF:[eof]
+guard
+	eof = true
+do
+end
+
+/*NextBlock : action ==>
+guard
+	w_block_num >= b_width
+do
+	h_block_num := h_block_num+1;
+	w_block_num := 0;
+end*/
+
+end
