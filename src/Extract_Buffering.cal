@@ -10,9 +10,11 @@ EXTRACT_BUFFERING:	action dct_input:[a] repeat 64 ==> output:[out]
 	if lastDctIdxIsOdd then
 		out := 1;
 		println("EXTRACT_BUFFERING: last index is odd and want to send 1");
-	else
+	else if lastDctIdxIsOdd = false then
+	    out := 0;
 		println("EXTRACT_BUFFERING: last index is even and want to send 0");
-	end
+	else
+	end end
     println("EXTRACT_BUFFERING: Done sending " + out);
 end
 end

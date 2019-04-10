@@ -8,19 +8,18 @@ actor Extract () int(size = 8) input ==> :
 	end
 	
 	// Write output to file
-	action input:[a] ==>
-	guard
-		a > 0
+WRITE:	action input:[a] ==>
 	do
-		println("Extract: The data is " + a);
-		write_o(a);
-	end
-	
-	// Close the file
-	action input:[a] ==>
-	guard
-		a = 35
-	do
-		write_close();
+		if a > 0 then
+		    if a = 35 then
+		    	println("Extract: received # Closing the file");
+				write_close();
+		    else
+			println("Extract: writing data" + a + "to file");
+			write_o(a);
+			end
+		else
+			println("Extract: received value less than or equal to 0, do nothing");
+		end
 	end
 end

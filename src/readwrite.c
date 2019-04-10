@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <math.h>
 
 FILE* input_i = NULL;
 FILE* output_o = NULL;
@@ -114,3 +115,8 @@ bool check_last_idx(int b)
         }
 	return isOdd;
 }
+
+int power_of_2 (int n)
+{
+	return pow(2,n);
+}	
