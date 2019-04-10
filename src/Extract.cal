@@ -2,6 +2,8 @@ actor Extract () int(size = 8) input ==> :
 	@native procedure write_init() end
 	@native procedure write_o(int b) end
 	@native procedure write_close() end
+	@native procedure exit_program() end
+	
 	initialize ==>
 	do
 		write_init();
@@ -12,8 +14,9 @@ WRITE:	action input:[a] ==>
 	do
 		if a > 0 then
 		    if a = 35 then
-		    	println("Extract: received # Closing the file");
+		    	println("Extract: received # Closing the file and exiting");
 				write_close();
+				exit_program();
 		    else
 			println("Extract: writing data" + a + "to file");
 			write_o(a);

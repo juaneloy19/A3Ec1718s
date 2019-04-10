@@ -119,4 +119,9 @@ bool check_last_idx(int b)
 int power_of_2 (int n)
 {
 	return pow(2,n);
-}	
+}
+
+void exit_program()
+{
+ exit(666); 
+}
