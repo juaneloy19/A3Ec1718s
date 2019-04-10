@@ -3,17 +3,17 @@ actor Insert () int(size = 1) msg_input, int(size=13) dct_input ==> int(size = 1
     bool lastDctIdxIsOdd := false;
     @native function check_last_idx(int b) --> bool end
 	
-DCT_BUFFERING:	action dct_input:[a] repeat 64, msg_input:[b]  ==> output:[out] repeat 64
-	var int out[64]
+DCT_BUFFERING:	action dct_input:[a] repeat 64, msg_input:[b]  ==> output:[out2] repeat 64
+	var int out[64], int(size=13) out2[64]
 	do
 	foreach int s in 0 .. 62 do
-		out[s] := a[s];
-		println("DCT_BUFFERING: Directly sending DCT input to output " + out[s]);
+		out2[s] := a[s];
+		println("DCT_BUFFERING: Directly sending DCT input to output " + out2[s]);
 	end
 	lastDctIdxIsOdd := 	check_last_idx(a[63]);
   	if b = 0 then
   		if lastDctIdxIsOdd then
-  			a[63] := a[63] +1;
+  			a[63] := a[63] +5;
   			println("DCT_BUFFERING: last index is odd and want to send 0 changing to " + a[63]);
   		else
   			println("DCT_BUFFERING: last index is even and want to send 0 sending " + a[63]);
@@ -22,20 +22,20 @@ DCT_BUFFERING:	action dct_input:[a] repeat 64, msg_input:[b]  ==> output:[out] r
   		if lastDctIdxIsOdd then
   			println("DCT_BUFFERING: last index is odd and want to send 1 sending " + a[63]);
   		else
-  			a[63] := a[63] +1;
+  			a[63] := a[63] +5;
   			println("DCT_BUFFERING: last index is even and want to send 1 changing to " + a[63]);
   		end
   	end
-	out[63] := a[63];
-    println("DCT_BUFFERING: Done sending " + out[63]);
+	out2[63] := a[63];
+    println("DCT_BUFFERING: Done sending " + out2[63]);
 end
 
-DCT_BYPASS:	action dct_input:[a] repeat 64 ==> output:[out] repeat 64
-	var int out[64]
+DCT_BYPASS:	action dct_input:[a] repeat 64 ==> output:[out2] repeat 64
+	var int out[64], int(size=13) out2[64]
 	do
 	foreach int s in 0 .. 63 do
-		out[s] := a[s];
-		println("DCT_BYPASS: Directly sending DCT input to output " + out[s]);
+		out2[s] := a[s];
+		println("DCT_BYPASS: Directly sending DCT input to output " + out2[s]);
 	end
     println("DCT_BYPASS: Done sending ");
 end
