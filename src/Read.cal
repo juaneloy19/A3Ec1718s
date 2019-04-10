@@ -1,23 +1,23 @@
 actor Read() ==> int(size = 8) out1:
 	uint(size=32) fileSize := 0;
 	uint(size=32) bytesRead := 0;
-	@native procedure source_init() end
+	@native procedure source_init_message() end
 	@native function source_read_i() --> int(size = 8) end
-	@native function source_sizeOfFile() --> int(size = 32) end
+	@native function source_sizeOfFile_message() --> int(size = 32) end
 	
 	initialize ==>
 
 	do
-		source_init();
+		source_init_message();
 	end
 	
 	// Get Size of File to Read
 	getFileSize: action ==>
 	guard
-		source_sizeOfFile() > 0
+		source_sizeOfFile_message() > 0
 	do
 		println("Get File Size");
-		fileSize := source_sizeOfFile();
+		fileSize := source_sizeOfFile_message();
 	end
 	
 	// Read a Byte
