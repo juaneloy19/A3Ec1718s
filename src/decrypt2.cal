@@ -1,11 +1,11 @@
-package encription;
 
-actor decrypt2 () uint(size=8) In, bool EOF ==>  uint (size=8) Out, bool done:
+//actor decrypt2 () uint(size=8) In, bool EOF ==>  uint (size=8) Out, bool done:
+actor decrypt2 () uint(size=8) In ==>  uint (size=8) Out:
 	
 	int  count:=0;
 	int  key:=0;
 	
-    read: action In: [ In1 ] ==> Out: [Out1]
+    action In: [ In1 ] ==> Out: [Out1]
     var
       uint(size=8) Out1, uint(size=8) data
     do
@@ -14,9 +14,11 @@ actor decrypt2 () uint(size=8) In, bool EOF ==>  uint (size=8) Out, bool done:
       		key:= In1;
       		//Out1 := In1;
      	    count := count+1;      
-     	else if In1-key = 35 then //# end of message
+ //    	else if In1-key = 35 then //# end of message
+     	else if In1 = 35 then //# end of message 
      	    println("End of message");
      	    count:=count+1;
+     	    Out1 := 35;
       	else   
       	    count := count+1;   
       	    data := In1-key;
@@ -25,7 +27,7 @@ actor decrypt2 () uint(size=8) In, bool EOF ==>  uint (size=8) Out, bool done:
       	end end
       		
     end
-	  
+	/*
     close: action EOF: [In1] ==>  done: [In1]  
     do
 		println("Done Decryption Message");
@@ -34,6 +36,6 @@ actor decrypt2 () uint(size=8) In, bool EOF ==>  uint (size=8) Out, bool done:
     schedule fsm state1:
       state1 ( read ) --> state1;
       state1 ( close ) --> state1; 
-    end
+    end*/
 
 end
