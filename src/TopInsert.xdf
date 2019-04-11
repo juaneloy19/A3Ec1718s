@@ -4,7 +4,7 @@
         <Class name="Read"/>
     </Instance>
     <Instance id="source">
-        <Class name="source"/>
+        <Class name="Source"/>
     </Instance>
     <Instance id="Message_Buffering">
         <Class name="Message_Buffering"/>
@@ -15,25 +15,30 @@
     <Instance id="replicator">
         <Class name="replicator"/>
     </Instance>
-    <Instance id="Extract">
-        <Class name="Extract"/>
-    </Instance>
     <Instance id="idct">
         <Class name="idct"/>
     </Instance>
     <Instance id="write">
-        <Class name="write"/>
+        <Class name="Writer"/>
     </Instance>
     <Instance id="Insert">
         <Class name="Insert"/>
     </Instance>
+    <Instance id="f2b">
+        <Class name="frame2blockS2"/>
+    </Instance>
+    <Instance id="b2f">
+        <Class name="block2frameS"/>
+    </Instance>
     <Connection dst="Message_Buffering" dst-port="msg_input" src="Read" src-port="out1"/>
-    <Connection dst="dct" dst-port="In" src="source" src-port="Stream"/>
     <Connection dst="Insert" dst-port="msg_input"
         src="Message_Buffering" src-port="bin_msg_out"/>
     <Connection dst="Insert" dst-port="dct_input" src="dct" src-port="Out"/>
     <Connection dst="replicator" dst-port="input1" src="Insert" src-port="output"/>
     <Connection dst="idct" dst-port="F" src="replicator" src-port="Output2"/>
-    <Connection dst="write" dst-port="Byte" src="idct" src-port="f"/>
-    <Connection dst="write" dst-port="pEOF" src="source" src-port="EOF"/>
+    <Connection dst="f2b" dst-port="I_pixel" src="source" src-port="Stream"/>
+    <Connection dst="dct" dst-port="In" src="f2b" src-port="O_pixel"/>
+    <Connection dst="b2f" dst-port="I_pixel" src="idct" src-port="f"/>
+    <Connection dst="write" dst-port="Byte" src="b2f" src-port="O_pixel"/>
+    <Connection dst="write" dst-port="pEOF" src="b2f" src-port="o_EOF"/>
 </XDF>

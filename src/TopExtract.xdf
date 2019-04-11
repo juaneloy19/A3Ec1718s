@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <XDF name="TopExtract">
-    <Instance id="source">
-        <Class name="source"/>
-    </Instance>
     <Instance id="dct">
         <Class name="dct"/>
     </Instance>
@@ -15,9 +12,16 @@
     <Instance id="Extract">
         <Class name="Extract"/>
     </Instance>
-    <Connection dst="dct" dst-port="In" src="source" src-port="Stream"/>
+    <Instance id="f2b">
+        <Class name="frame2blockS2"/>
+    </Instance>
+    <Instance id="Source">
+        <Class name="Source"/>
+    </Instance>
     <Connection dst="Extract_Buffering" dst-port="dct_input" src="dct" src-port="Out"/>
     <Connection dst="Extract_consolidate" dst-port="buffer_input"
         src="Extract_Buffering" src-port="output"/>
     <Connection dst="Extract" dst-port="input" src="Extract_consolidate" src-port="output"/>
+    <Connection dst="f2b" dst-port="I_pixel" src="Source" src-port="Stream"/>
+    <Connection dst="dct" dst-port="In" src="f2b" src-port="O_pixel"/>
 </XDF>
