@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="TopInsert">
+    <Instance id="Read">
+        <Class name="Read"/>
+    </Instance>
+    <Instance id="source">
+        <Class name="source"/>
+    </Instance>
+    <Instance id="Message_Buffering">
+        <Class name="Message_Buffering"/>
+    </Instance>
+    <Instance id="write">
+        <Class name="write"/>
+    </Instance>
+    <Instance id="Insert">
+        <Class name="Insert"/>
+    </Instance>
+    <Instance id="f2b">
+        <Class name="frame2blockS2"/>
+    </Instance>
+    <Instance id="b2f">
+        <Class name="block2frameS"/>
+    </Instance>
+    <Instance id="encrypt3">
+        <Class name="encrypt3"/>
+    </Instance>
+    <Connection dst="Insert" dst-port="msg_input"
+        src="Message_Buffering" src-port="bin_msg_out"/>
+    <Connection dst="write" dst-port="Byte" src="b2f" src-port="O_pixel"/>
+    <Connection dst="write" dst-port="pEOF" src="b2f" src-port="o_EOF"/>
+    <Connection dst="f2b" dst-port="I_pixel" src="source" src-port="Stream"/>
+    <Connection dst="b2f" dst-port="I_pixel" src="Insert" src-port="output"/>
+    <Connection dst="Insert" dst-port="dct_input" src="f2b" src-port="O_pixel"/>
+    <Connection dst="Message_Buffering" dst-port="msg_input"
+        src="encrypt3" src-port="Out"/>
+    <Connection dst="encrypt3" dst-port="In" src="Read" src-port="out1"/>
+</XDF>

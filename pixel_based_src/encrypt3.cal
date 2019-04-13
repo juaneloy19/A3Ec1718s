@@ -1,0 +1,50 @@
+actor encrypt3 () int(size=8) In ==>  int (size=8) Out:
+	
+	int  count:=0;
+	int  key:=0;
+	
+    read: action In: [ In1 ] ==> Out: [Out1]
+    guard
+		In1>0
+    var
+      int(size=8) Out1, int(size=8) data 
+    do
+    	if count = 0 then
+    		if In1 = 52 then
+    			key:=4;
+    		else if In1=53 then
+    			key :=5;
+    		else if In1=54 then
+    			key :=6;
+    		else if In1=55 then
+    			key:=7;
+    		else if In1=56 then
+    			key :=8;
+    		else if In1=57 then
+    			key :=9;
+    		else
+    			key :=10;
+    		end end end end end end 
+      		println("KEY is " + key);
+      		count := count+1;
+      		Out1 := key;
+      	else
+      	    count := count+1;
+      	    if In1 = 35 then//End of message
+      	    	data:=35;
+            	println("End Of Message" + data );
+      	    	Out1 := data;
+      	    else if In1 = 0 then
+      	    	data:=0;
+      			Out1 := data;     
+      			println("End Of File" + data ); 	    	
+      	    else    
+      	    	data := In1+key;    
+      	    	//data := In1;//TODO      		
+      	    	println("Data=" + In1 + " Encryption=" + data + " Key=" + key );
+      	    	Out1 := data;
+      	    end end
+      	end
+      		
+    end
+end

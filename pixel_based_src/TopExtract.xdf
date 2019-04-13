@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="TopExtract">
+    <Instance id="Extract_Buffering">
+        <Class name="Extract_Buffering"/>
+    </Instance>
+    <Instance id="Extract_consolidate">
+        <Class name="Extract_consolidate"/>
+    </Instance>
+    <Instance id="Extract">
+        <Class name="Extract"/>
+    </Instance>
+    <Instance id="f2b">
+        <Class name="frame2blockS2"/>
+    </Instance>
+    <Instance id="Source">
+        <Class name="source"/>
+    </Instance>
+    <Instance id="decrypt2">
+        <Class name="decrypt2"/>
+    </Instance>
+    <Connection dst="Extract_consolidate" dst-port="buffer_input"
+        src="Extract_Buffering" src-port="output"/>
+    <Connection dst="f2b" dst-port="I_pixel" src="Source" src-port="Stream"/>
+    <Connection dst="Extract_Buffering" dst-port="dct_input" src="f2b" src-port="O_pixel"/>
+    <Connection dst="decrypt2" dst-port="In" src="Extract_consolidate" src-port="output"/>
+    <Connection dst="Extract" dst-port="input" src="decrypt2" src-port="Out"/>
+</XDF>

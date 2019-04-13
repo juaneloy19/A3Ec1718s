@@ -1,0 +1,36 @@
+actor Extract_consolidate () int(size=1) buffer_input ==> uint(size = 8) output:
+	int (size =8)a := 0;
+	List (type:int (size =1), size = 8) charBuffer;
+	
+	@native function power_of_2 (int n) --> int end
+	
+EXTRACT_CONSOL:	action buffer_input:[b] repeat 8 ==> output:[out]
+    guard
+    b[0]>=0
+	var uint (size =8) out, int (size =9) temp_out
+	do
+	println("EXTRACT_CONSOL:Inside action");
+	temp_out := 0;
+	println("EXTRACT_CONSOL:reset temp_out " +temp_out);
+	foreach int i in 0 .. 7 do
+	        charBuffer[i] := b[i];
+	        println("EXTRACT_CONSOL: charBuffer bit " + i + " is " + charBuffer[i]);
+    end
+    
+	 a := 0;
+	foreach int i in 0 .. 7 do
+	    temp_out := (charBuffer[7-i] * power_of_2(7-a)) + temp_out;
+	    println("EXTRACT_CONSOL: convert_to_dec loop i " +i+ " temp_out " + temp_out + " charBuffer[7-i] = " +charBuffer[7-i]+ " a " +a+ " pow2 7-a " + power_of_2(7-a) );
+        a := a +1;
+	end
+    
+    println("EXTRACT_CONSOL:After covert_to_dec temp_out " +temp_out);
+    if temp_out < 127 then
+    	out := temp_out;
+    else
+    	out:=0;
+    end
+    println("EXTRACT_CONSOL: Done sending " + out);
+end
+    
+end

@@ -1,0 +1,66 @@
+actor Message_Buffering() int(size = 8) msg_input ==> int(size = 1) bin_msg_out:
+	int (size=8) msgBuffIdx :=0;
+    int (size=8) msgBuffCpyIdx :=0;
+    int (size=8) charBuffIdx :=0;
+   
+    List (type:int, size = 8) charBuffer;
+    List (type:List(type:int,size = 8), size = 198) msgBuffer;
+    @native function check_last_idx(int b) --> bool end
+	@native function char_to_ascii(int b) --> int(size = 13) end
+	
+	procedure convert_to_bin(int(size =8) n, int(size =8) buff[8])
+	begin
+		println("Convert_to_bin: converting " + n);
+		foreach int i in 0 .. 7 do
+     		if (n & (1 << i)) = 0 then
+       			buff[i] := 0;
+       			println("Convert_to_bin: bit " + i + " is 0");
+     		else
+       			buff[i] := 1;
+       			println("Convert_to_bin: bit " + i + " is 1");
+     		end
+    	end
+	end
+	
+MESSAGE_BUFFERING:	action msg_input:[b] ==>
+	guard
+		b>0
+    var int(size=1)tmpMsgBuff [8]
+	do
+	   convert_to_bin(b,tmpMsgBuff);
+	   println("Received message input msgBuffIdx" + msgBuffIdx);
+	   foreach int i in 0 ..7  do
+	   	msgBuffer[msgBuffIdx][i] := tmpMsgBuff[i];
+	   end
+	   msgBuffIdx := msgBuffIdx + 1;
+	   foreach int i in 0 .. 7 do
+	   	  println("Received message input tmpMsgBuff bit" + i + "is " + tmpMsgBuff[i]);
+	   end
+	end
+	
+SEND_CHAR_BIT:	action ==> bin_msg_out:[out]
+    guard
+    	charBuffIdx > 0
+	var int (size =1) out
+	do
+		out := charBuffer[8-charBuffIdx];
+		charBuffIdx :=charBuffIdx -1;
+	end
+
+CHAR_BUFFERING:	action ==>
+	guard
+		(charBuffIdx = 0) and (msgBuffCpyIdx < msgBuffIdx)
+	do
+	    
+	    foreach int i in 0 ..7  do
+	   	  charBuffer [i] := msgBuffer[msgBuffCpyIdx][i];
+	    end
+	    println("Loading charBuffer, msgBuffCpyIdx " + msgBuffCpyIdx);
+	    foreach int i in 0 ..7  do
+	   	  println("charBuffer bit" + i + "is " + charBuffer[i]);
+	   end
+	    msgBuffCpyIdx := msgBuffCpyIdx + 1;
+	    charBuffIdx := 8;
+	end
+	
+end
