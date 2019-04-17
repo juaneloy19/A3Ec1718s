@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="sourceDupTest">
+    <Instance id="Source">
+        <Class name="Source"/>
+    </Instance>
+    <Instance id="Dup">
+        <Class name="Duplicate"/>
+    </Instance>
+    <Instance id="Approx">
+        <Class name="Approx"/>
+    </Instance>
+    <Instance id="Abs_diff">
+        <Class name="Abs_Diff"/>
+    </Instance>
+    <Instance id="Sum">
+        <Class name="Sum"/>
+    </Instance>
+    <Connection dst="Dup" dst-port="Frame" src="Source" src-port="Stream"/>
+    <Connection dst="Approx" dst-port="Dup" src="Dup" src-port="Dup"/>
+    <Connection dst="Abs_diff" dst-port="Approx" src="Approx" src-port="Approx"/>
+    <Connection dst="Abs_diff" dst-port="Original" src="Dup" src-port="Original"/>
+    <Connection dst="Sum" dst-port="Number" src="Abs_diff" src-port="Diff"/>
+    <Connection dst="Dup" dst-port="EOF" src="Source" src-port="EOF"/>
+</XDF>
