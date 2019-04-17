@@ -1,0 +1,26 @@
+actor Extract_Buffering_band () int(size=13) dct_input ==> int(size = 1) output:
+    
+    int deltaBand0 := 0;
+    int deltaBand1 := 0;
+    @native function check_last_idx(int b) --> bool end
+    @native function delta_band0(int b, int multiple) --> int end 
+    @native function delta_band1(int b, int multiple) --> int end
+    
+	
+EXTRACT_BUFFERING:	action dct_input:[a] repeat 64 ==> output:[out]
+	var int (size =1) out
+	do
+	println("EXTRACT_BUFFERING_band: last index " +a[63]+ " has delta_band1 " +delta_band1(a[63],8)+  " and delta_band0 " +delta_band0(a[63],8));
+	if delta_band1(a[63],16) < delta_band0(a[63],16)then
+	    out := 1;
+		println("EXTRACT_BUFFERING_band: last index" +a[63]+  "is closer to delta_band1");
+	else if delta_band1(a[63],16) > delta_band0(a[63],16) then
+	    out := 0;
+		println("EXTRACT_BUFFERING_band: last index" +a[63]+  "is closer to delta_band0");
+	else
+	    println("EXTRACT_BUFFERING_band: last index" +a[63]+  "is midway between band1 and band0 which is UNEXPECTED!!!");
+	    out := -1;
+	end end
+    println("EXTRACT_BUFFERING: Done sending " + out);
+	end
+end

@@ -125,3 +125,25 @@ void exit_program()
 {
  exit(666); 
 }
+
+int round_nearest_band0(int b, int multiple)
+{
+    b += b < 0 ? -multiple / 2 : multiple / 2;
+    return b - (b%multiple);
+}
+
+int round_nearest_band1(int b, int multiple)
+{
+
+    return round_nearest_band0(b,multiple) + (multiple / 2); 
+}
+
+int delta_band0(int b, int multiple)
+{
+    return abs(b - round_nearest_band0(b,multiple));
+}
+
+int delta_band1(int b, int multiple)
+{
+    return abs(b - round_nearest_band1(b,multiple));
+}

@@ -1,0 +1,32 @@
+actor Extract_Buffering_average_vote () int(size=13) dct_input ==> int(size = 1) output:
+    
+    bool lastDctIdxIsOdd := false;
+    int oddValueCount := 0;
+    @native function check_last_idx(int b) --> bool end
+	
+EXTRACT_BUFFERING:	action dct_input:[a] repeat 64 ==> output:[out]
+	var int (size =1) out
+	do
+	lastDctIdxIsOdd := false;
+	oddValueCount := 0;
+	foreach int t in 60 .. 63 do
+		lastDctIdxIsOdd := 	check_last_idx(a[t]);
+		if lastDctIdxIsOdd then
+			oddValueCount := oddValueCount +1;
+			println("EXTRACT_BUFFERING_average_vote: index" +t+ " is odd and want incrementing oddValueCount " + oddValueCount);
+		else if lastDctIdxIsOdd = false then
+			println("EXTRACT_BUFFERING_average_vote: index" +t+ " is even, oddValueCount is still " +oddValueCount);
+		else
+		end end
+	    println("EXTRACT_BUFFERING_average_vote: Done iteration " +t);
+	end
+	if  oddValueCount > 2 then
+			out := 1;
+			println("EXTRACT_BUFFERING_average_vote: vote is " +oddValueCount+ " for odd want to send 1");
+	else
+		    out := 0;
+			println("EXTRACT_BUFFERING_average_vote: vote is " +oddValueCount+ " for odd, therefore even and want to send 0");
+	end
+	println("EXTRACT_BUFFERING_average_vote: Done sending " + out);
+end
+end
