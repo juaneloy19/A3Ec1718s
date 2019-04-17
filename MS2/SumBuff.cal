@@ -1,0 +1,135 @@
+actor SumBuff()  uint(size=8) Diff  ==> uint(size=8) Sum, bool EOF:
+
+	@native procedure endMS2 () end
+	@native procedure get_cpu_util () end
+
+	int y_num := 0;
+	int u_num := 0;
+	int v_num := 0;
+	int f_width  = 352;
+	int f_height = 288;
+	int f_pixels = f_width*f_height;
+	int b_size   = 8;
+	int b_size2  = b_size*b_size;
+	int b2_size  = b_size/2;
+	int b2_size2 = b2_size * b2_size;
+	int b_width  = f_width/b_size;
+	int b_height = f_height/b_size;
+	int y_total = b_width*b_height;
+	int u_total = y_total;
+	int v_total = y_total;
+	bool y_done := false;
+	bool u_done := false;
+	bool v_done := false;
+	int num_frame := 0;
+	int frames := 10;
+	int sum := 0;
+	bool eof := false;
+
+sumY: action Diff:[diff] repeat b_size2 ==>
+guard
+	y_done = false
+var
+	uint(size=9) idx := 0
+do
+	foreach int y in 0 .. b_size-1
+	do
+		foreach int x in 0 .. b_size-1
+		do
+			sum := sum + diff[idx];
+			idx := idx + 1;
+		end
+	end
+	y_num := y_num +1;
+	//println("Frame "+num_frame+" Sum Y Received : "+y_num+" Sum = "+sum);
+	if y_num = y_total
+	then
+		y_num := 0;
+		y_done := true;
+		u_done := false;
+		v_done := false;
+	end
+end
+
+sumU: action Diff:[diff] repeat b2_size2 ==>
+guard
+	y_done = true and u_done = false
+var
+	uint(size=9) idx := 0
+do
+	foreach int y in 0 .. b2_size-1
+	do
+		foreach int x in 0 .. b2_size-1
+		do
+			sum := sum + diff[idx];
+			idx := idx + 1;
+		end
+	end
+	u_num := u_num +1;
+	//println("Frame "+num_frame+" Sum U Received : "+u_num+" Sum = "+sum);
+	if u_num = u_total
+	then
+		u_num := 0;
+		y_done := true;
+		u_done := true;
+		v_done := false;
+	end
+end
+
+sumV: action Diff:[diff] repeat b2_size2 ==>
+guard
+	y_done = true and u_done = true and v_done = false
+var
+	uint(size=9) idx := 0
+do
+	foreach int y in 0 .. b2_size-1
+	do
+		foreach int x in 0 .. b2_size-1
+		do
+			sum := sum + diff[idx];
+			idx := idx + 1;
+		end
+	end
+	v_num := v_num +1;
+	//println("Frame "+num_frame+" Sum V Received : "+v_num+" Sum = "+sum);
+	if v_num = v_total
+	then
+		v_num := 0;
+		y_done := true;
+		u_done := true;
+		v_done := true;
+	end
+end
+
+nextFrame: action ==> Sum:[f_sum], EOF:[eof]
+	guard
+		y_done = true and u_done = true and v_done = true
+	var
+		int f_sum := 0
+	do
+		if num_frame != frames
+		then
+			y_done := false;
+			u_done := false;
+			v_done := false;
+			num_frame := num_frame + 1;
+			f_sum := sum/f_pixels;
+			sum := 0;
+			println("Frame "+num_frame+" : SAD = "+f_sum);
+			get_cpu_util();
+		end
+		if num_frame = frames
+		then		
+			eof := true;
+			println("Last Frame "+num_frame+" = "+frames+" complete");
+		end
+	end
+
+endRun: action ==> 
+	guard
+		eof = true
+	do
+		endMS2();
+	end
+
+end

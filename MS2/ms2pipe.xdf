@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="ms2pipe">
+    <Instance id="Source">
+        <Class name="Source"/>
+    </Instance>
+    <Instance id="Pipe_Duplicate">
+        <Class name="duppipeframe2block"/>
+    </Instance>
+    <Instance id="Approx">
+        <Class name="ApproxBuf"/>
+    </Instance>
+    <Instance id="Diff">
+        <Class name="AbsDiffBuff"/>
+    </Instance>
+    <Instance id="Sum">
+        <Class name="SumBuff"/>
+    </Instance>
+    <Connection dst="Pipe_Duplicate" dst-port="I_pixel" src="Source" src-port="Stream"/>
+    <Connection dst="Approx" dst-port="I_pix" src="Pipe_Duplicate" src-port="O_pixel"/>
+    <Connection dst="Diff" dst-port="Duplicate" src="Pipe_Duplicate" src-port="D_pixel"/>
+    <Connection dst="Diff" dst-port="Approx" src="Approx" src-port="Approx"/>
+    <Connection dst="Sum" dst-port="Diff" src="Diff" src-port="Diff"/>
+</XDF>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<XDF name="ms2Buff">
+    <Instance id="source">
+        <Class name="Source"/>
+    </Instance>
+    <Instance id="f2b_dup">
+        <Class name="dupframe2block"/>
+    </Instance>
+    <Instance id="approx_buff">
+        <Class name="ApproxBuf"/>
+    </Instance>
+    <Instance id="absdiff_buff">
+        <Class name="AbsDiffBuff"/>
+    </Instance>
+    <Instance id="sum_buff">
+        <Class name="SumBuff"/>
+    </Instance>
+    <Connection dst="f2b_dup" dst-port="I_pixel" src="source" src-port="Stream"/>
+    <Connection dst="approx_buff" dst-port="I_pix" src="f2b_dup" src-port="O_pixel"/>
+    <Connection dst="absdiff_buff" dst-port="Approx" src="approx_buff" src-port="Approx"/>
+    <Connection dst="absdiff_buff" dst-port="Duplicate" src="f2b_dup" src-port="D_pixel"/>
+    <Connection dst="sum_buff" dst-port="Diff" src="absdiff_buff" src-port="Diff"/>
+</XDF>

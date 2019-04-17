@@ -1,0 +1,27 @@
+actor Sum () uint(size=8) Number ==> uint(size=32) Average:
+
+uint(size=32) sum := 0;
+uint(size=32) mean := 0;
+uint(size=32) elements := 0;
+uint(size=32) frame_size = 352*288;
+
+Adding: action Number:[n] ==>
+guard
+	elements < frame_size
+do
+	sum := sum+n;
+	elements := elements +1;
+	//println("Current Sum: "+sum+" after elements "+elements);
+end
+
+Sending: action ==> Average:[mean]
+guard
+	elements >= frame_size
+do
+	mean := sum/elements;
+	println("Sending mean:"+mean+" after elements "+elements);
+	elements := 0;
+	sum := 0;
+end
+
+end

@@ -1,0 +1,132 @@
+actor ApproxBuf() uint(size=8)I_pix  ==> uint(size=8) Approx:
+	uint(size=8) mean := 0;
+	int y_num := 0;
+	int u_num := 0;
+	int v_num := 0;
+	int f_width  = 352;
+	int f_height = 288;
+	int b_size   = 8;
+	int b_size2  = b_size*b_size;
+	int b2_size  = b_size/2;
+	int b2_size2 = b2_size * b2_size;
+	List(type:uint(size=8),size=b_size2) mean_out;
+	int b_width  = f_width/b_size;
+	int b_height = f_height/b_size;
+	int y_total = b_width*b_height;
+	int u_total = y_total;
+	int v_total = y_total;
+	bool y_done := false;
+	bool u_done := false;
+	bool v_done := false;
+	int num_frame := 0;
+	int frames := 10;
+	
+replaceYValue: action I_pix :[Bytes] repeat b_size2 ==> Approx:[mean_out] repeat b_size2
+	guard
+		y_done = false
+	var
+		uint(size=9)  idx  := 0,
+		uint(size=16)  sum  := 0
+	do
+		foreach int y in 0 .. b_size-1
+		do
+			foreach int x in 0 .. b_size-1
+			do
+				sum := sum+ Bytes[idx];
+				idx := idx + 1;
+			end
+		end
+		mean := sum/(b_size2);
+		foreach int i in 0 .. b_size2-1
+		do
+			mean_out[i] := mean;
+		end
+		y_num := y_num +1;
+		//println("Frame "+num_frame+" Approx Y Received : "+y_num+" mean = "+mean);
+		if y_num = y_total
+		then
+			y_num := 0;
+			y_done := true;
+			u_done := false;
+			v_done := false;
+		end
+	end
+
+replaceUValue: action I_pix :[Bytes] repeat b2_size2 ==> Approx:[mean_out] repeat b2_size2
+	guard
+		y_done = true and u_done = false
+	var
+		uint(size=9)  idx  := 0,
+		uint(size=16)  sum  := 0
+	do
+		foreach int y in 0 .. b2_size-1
+		do
+			foreach int x in 0 .. b2_size-1
+			do
+				sum := sum+ Bytes[idx];
+				idx := idx + 1;
+			end
+		end
+		mean := sum/b2_size2;
+		foreach int i in 0 .. b2_size2-1
+		do
+			mean_out[i] := mean;
+		end
+		u_num := u_num +1;
+		//println("Frame "+num_frame+" Approx U Received : "+u_num+" mean = "+mean);
+		if u_num = u_total
+		then
+			u_num := 0;
+			y_done := true;
+			u_done := true;
+			v_done := false;
+		end
+		
+	end
+	
+replaceVValue: action I_pix :[Bytes] repeat b2_size2 ==> Approx:[mean_out] repeat b2_size2
+	guard
+		y_done = true and u_done = true and v_done = false
+	var
+		uint(size=9)  idx  := 0,
+		uint(size=16)  sum  := 0
+	do
+		foreach int y in 0 .. b2_size-1
+		do
+			foreach int x in 0 .. b2_size-1
+			do
+				sum := sum+ Bytes[idx];
+				idx := idx + 1;
+			end
+		end
+		mean := sum/b2_size2;
+		foreach int i in 0 .. b2_size2-1
+		do
+			mean_out[i] := mean;
+		end
+		v_num := v_num +1;
+		//println("Frame "+num_frame+" Approx V Received : "+v_num+" mean = "+mean);
+		if v_num = v_total
+		then
+			v_num := 0;
+			y_done := true;
+			u_done := true;
+			v_done := true;
+		end
+	end
+
+nextFrame: action ==>
+	guard
+		y_done = true and u_done = true and v_done = true
+	do
+		if num_frame != frames
+		then
+			y_done := false;
+			u_done := false;
+			v_done := false;
+			num_frame := num_frame + 1;
+			//println("Frame "+num_frame+" Approx complete");
+		end
+	end	
+
+end
